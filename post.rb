@@ -22,8 +22,12 @@ class Post
     if !id.nil?
       db.results_as_hash = true
 
-      result = db.execute('SELECT * FROM posts WHERE rowid = ?', id)
-
+      begin
+        result = db.execute('SELECT * FROM posts WHERE rowid = ?', id)
+      rescue SQLite3::SQLException => e
+        puts "Request failed #{SQLITE_DB_FILE}"
+        puts e.message
+      end
       db.close
 
       if result.empty?
@@ -49,12 +53,22 @@ class Post
     query += 'ORDER by rowid DESC '
     query += 'LIMIT :limit ' unless limit.nil?
 
-    statement = db.prepare query
+    begin
+      statement = db.prepare query
+    rescue  SQLite3::SQLException => e
+      puts "Request failed #{SQLITE_DB_FILE}"
+      puts e.message
+    end
 
     statement.bind_param('type', type) unless type.nil?
     statement.bind_param('limit', limit) unless limit.nil?
 
-    result = statement.execute!
+    begin
+      result = statement.execute!
+    rescue SQLite3::SQLException => e
+      puts "Request failed #{SQLITE_DB_FILE}"
+      puts e.message
+    end
 
     statement.close
     db.close
