@@ -16,7 +16,7 @@ class Post
     @text = []
   end
 
-  def self.find(limit, type, id)
+  def self.find_by_id(id)
     db = SQLite3::Database.open(SQLITE_DB_FILE)
 
     if !id.nil?
@@ -33,36 +33,33 @@ class Post
         result = result[0]
 
         post = create(result['type'])
-
         post.load_data(result)
-
         post
       end
-    else
-      db.results_as_hash = false
-
-      query = 'SELECT rowid, * FROM posts '
-
-      query += 'WHERE type = :type ' unless type.nil?
-
-      query += 'ORDER by rowid DESC '
-
-      query += 'LIMIT :limit ' unless limit.nil?
-
-      statement = db.prepare query
-
-      statement.bind_param('type', type) unless type.nil?
-
-      statement.bind_param('limit', limit) unless limit.nil?
-
-      result = statement.execute!
-
-      statement.close
-
-      db.close
-
-      result
     end
+  end
+
+  def self.find_all(limit, type)
+    db = SQLite3::Database.open(SQLITE_DB_FILE)
+
+    db.results_as_hash = false
+
+    query = 'SELECT rowid, * FROM posts '
+    query += 'WHERE type = :type ' unless type.nil?
+    query += 'ORDER by rowid DESC '
+    query += 'LIMIT :limit ' unless limit.nil?
+
+    statement = db.prepare query
+
+    statement.bind_param('type', type) unless type.nil?
+    statement.bind_param('limit', limit) unless limit.nil?
+
+    result = statement.execute!
+
+    statement.close
+    db.close
+
+    result
   end
 
   def read_from_console
