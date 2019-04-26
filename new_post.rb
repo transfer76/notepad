@@ -1,7 +1,7 @@
-require_relative 'post'
-require_relative 'link'
-require_relative 'memo'
-require_relative 'task'
+require_relative 'lib/post'
+require_relative 'lib/link'
+require_relative 'lib/memo'
+require_relative 'lib/task'
 
 puts 'Hello! I\'m yours notepad!'
 puts
