@@ -19,7 +19,7 @@ class Post
   def self.find_by_id(id)
     db = SQLite3::Database.open(SQLITE_DB_FILE)
 
-    if !id.nil?
+    unless id.nil?
       db.results_as_hash = true
 
       begin
@@ -98,15 +98,9 @@ class Post
 
     post_hash = to_db_hash
 
-    db.execute(
-      "INSERT INTO posts (" +
-
-        post_hash.keys.join(', ') +
-
-        ") VALUES (#{('?,' * post_hash.size).chomp(',')})",
-
-      post_hash.values
-    )
+    db.execute("INSERT INTO posts (#{post_hash.keys.join(', ')})
+                  VALUES (#{('?,' * post_hash.size).chomp(',')})",
+               post_hash.values)
 
     insert_row_id = db.last_insert_row_id
 
